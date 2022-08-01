@@ -3,6 +3,7 @@
 #include <Badge2020_Buzzer.h>
 #include <Badge2020_TFT.h>
 #include <Adafruit_NeoPixel.h>
+#include <Badge2020_Accelerometer.h>
 
 #define WS2812_PIN 2
 #define WS2812_NUMPIXELS 5
@@ -11,6 +12,10 @@ void changeNeoPixels();
 void updateTFT();
 
 Adafruit_NeoPixel neoPixels(WS2812_NUMPIXELS, WS2812_PIN, NEO_GRB);
+
+//accelerometer
+Badge2020_Accelerometer accelerometer;
+int accelerometer_initialised = -1;
 
 //buzzer
 Badge2020_Buzzer buzzer;
@@ -29,16 +34,22 @@ void buzzer_once() {
 //blink non-blocking
 const int ledPin = 25;
 int ledState = LOW;
-unsigned long previousMillis = 0;        // will store last time LED was updated
-const long interval = 250;           // interval at which to blink (milliseconds)
+unsigned long previousMillis = 0;
+unsigned int IR_level;
+const long interval = 200;
 void blink() {
   unsigned long currentMillis = millis();
   if (currentMillis - previousMillis >= interval) {
     previousMillis = currentMillis;
     if (ledState == LOW) {
+      pinMode(ledPin, OUTPUT);
+      delay(20);
       ledState = HIGH;
     } else {
       ledState = LOW;
+      pinMode(ledPin, INPUT);
+      delay(100);
+      IR_level = analogRead(ledPin);
     }
     digitalWrite(ledPin, ledState);
     changeNeoPixels();
@@ -77,16 +88,39 @@ void updateTFT() {
     tft.setTextColor(ST77XX_GREEN);
   }
   tft.print("Touch 2: " + String(touchRead(13)));
+  tft.setCursor(10,90);
+  tft.setTextColor(ST77XX_WHITE);
+  tft.print("IR-level: " + String(IR_level));
+  tft.setCursor(10,110);
+  if (accelerometer_initialised == 0) {
+    tft.setTextColor(ST77XX_GREEN);
+    tft.print("ACC OK");
+    int16_t x, y, z;
+    accelerometer.readXYZ(x, y, z);
+    accelerometer.mgScale(x, y, z);
+    // make it a unit length vector
+    double length = sqrt( x*x + y*y + z*z );
+    int unitx = round(240-((x / length)+1)*120);
+    double unity = round(100-((y / length)+1)*50);
+    tft.setTextColor(ST77XX_WHITE);
+    tft.setCursor(unitx,130+unity);
+    tft.print("0");
+  }
+  else{
+    tft.setTextColor(ST77XX_RED);
+    tft.setTextSize(3);
+    tft.print("ACC NOT OK");    
+  }
 }
 
 
 void setup() {
-  pinMode(ledPin, OUTPUT);
   buzzer_once();
   tft.init(240, 240);
   tft.setRotation( 2 );
   neoPixels.begin();
-
+  Wire.begin();
+  accelerometer_initialised = accelerometer.init(LIS2DH12_RANGE_2GA);
 }
 
 
