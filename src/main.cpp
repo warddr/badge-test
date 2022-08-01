@@ -7,6 +7,8 @@
 #define WS2812_PIN 2
 #define WS2812_NUMPIXELS 5
 
+void changeNeoPixels();
+
 Adafruit_NeoPixel neoPixels(WS2812_NUMPIXELS, WS2812_PIN, NEO_GRB);
 
 //buzzer
