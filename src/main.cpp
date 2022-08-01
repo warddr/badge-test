@@ -8,6 +8,7 @@
 #define WS2812_NUMPIXELS 5
 
 void changeNeoPixels();
+void updateTFT();
 
 Adafruit_NeoPixel neoPixels(WS2812_NUMPIXELS, WS2812_PIN, NEO_GRB);
 
@@ -29,7 +30,7 @@ void buzzer_once() {
 const int ledPin = 25;
 int ledState = LOW;
 unsigned long previousMillis = 0;        // will store last time LED was updated
-const long interval = 1000;           // interval at which to blink (milliseconds)
+const long interval = 250;           // interval at which to blink (milliseconds)
 void blink() {
   unsigned long currentMillis = millis();
   if (currentMillis - previousMillis >= interval) {
@@ -41,6 +42,7 @@ void blink() {
     }
     digitalWrite(ledPin, ledState);
     changeNeoPixels();
+    updateTFT();
   }
 }
 
@@ -92,8 +94,6 @@ void setup() {
 void loop() {
   //heartbeat
   blink();
-  updateTFT();
-  delay(20);
 
 }
 
