@@ -98,7 +98,7 @@ void loop() {
 }
 
 int currCol = 0;
-int colors[4][3] = {{255, 0, 0}, {0, 255, 0}, {0, 0, 255}, {255, 255, 255}};
+int colors[4][3] = {{15, 0, 0}, {0, 15, 0}, {0, 0, 15}, {15, 15, 15}};
 
 void changeNeoPixels() {
   currCol = (currCol + 1) % 4;
