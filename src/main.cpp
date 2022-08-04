@@ -36,8 +36,7 @@ void buzzer_once()
 const int ledPin = 25;
 int ledState = LOW;
 unsigned long previousMillis = 0;
-unsigned int IR_level;
-const long interval = 200;
+const long interval = 300;
 void blink()
 {
   unsigned long currentMillis = millis();
@@ -46,16 +45,12 @@ void blink()
     previousMillis = currentMillis;
     if (ledState == LOW)
     {
-      pinMode(ledPin, OUTPUT);
-      delay(20);
       ledState = HIGH;
     }
     else
     {
       ledState = LOW;
-      pinMode(ledPin, INPUT);
       delay(100);
-      IR_level = analogRead(ledPin);
     }
     digitalWrite(ledPin, ledState);
     changeNeoPixels();
@@ -105,7 +100,7 @@ void updateTFT()
   tft.print("Touch 2: " + String(touchRead(13)));
   tft.setCursor(10, 90);
   tft.setTextColor(ST77XX_WHITE);
-  tft.print("IR-level: " + String(IR_level));
+  tft.print("battery level: " + String(analogRead(35)));
   tft.setCursor(10, 110);
   if (accelerometer_initialised == 0)
   {
@@ -138,6 +133,7 @@ void setup()
   neoPixels.begin();
   Wire.begin();
   accelerometer_initialised = accelerometer.init(LIS2DH12_RANGE_2GA);
+  pinMode(ledPin, OUTPUT);
 }
 
 void loop()
